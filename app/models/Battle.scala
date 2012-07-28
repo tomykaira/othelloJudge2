@@ -37,7 +37,7 @@ case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
       challenger.get.run(port)
       opponent.get.run(port)
     } else {
-      BattleRecorder.report(AbnormalExit(this, "clienti not created"))
+      BattleRecorder.report(AbnormalExit(this, "client not created"))
     }
   }
 }
@@ -85,6 +85,12 @@ object Battle {
     DB.withConnection { implicit connection =>
       SQL(
         "select * from battle".stripMargin).as(Battle.simple.*)
+    }
+  }
+
+  def findById(id: Long): Option[Battle] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from battle where id = {id}").on('id -> id).as(Battle.simple.singleOpt)
     }
   }
 
