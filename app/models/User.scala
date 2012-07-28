@@ -55,14 +55,13 @@ object User {
   /**
    * Retrieve all users with program excluding me.
    */
-  def findAllButMeWithProgram(email: String): Seq[(User, Program)] = {
+  def findAllWithProgram: Seq[(User, Program)] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
           select * from user INNER JOIN program
           WHERE user.email = program.email
-          AND NOT user.email = {email}
-        """).on('email -> email
+        """
       ).as(
         get[String]("user.email") ~
           get[String]("user.name") ~
