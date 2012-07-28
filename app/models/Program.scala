@@ -121,7 +121,7 @@ object Program {
   def create(user: String): Program = {
     val newVersion = this.latestVersion(user).getOrElse(0) + 1
     val pathSafenName = user.replaceAll("[^a-zA-Z0-9]", "_")
-    val path = "/tmp/" + pathSafenName + "/" + newVersion + ".zip"
+    val path = "/othello-judge/" + pathSafenName + "/" + newVersion + ".zip"
     DB.withConnection { implicit connection =>
       SQL(
         """

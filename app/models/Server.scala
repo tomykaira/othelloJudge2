@@ -13,7 +13,7 @@ class Server(val battle: Battle, val port: Int)
   extends Thread {
 
   val GAME_TIMEOUT = 10000
-  val SERVER_PROGRAM = new File("/tmp/sample/reversi-serv")
+  val SERVER_PROGRAM = new File("/othello-judge/servers/reversi-serv")
 
   override def run() = {
     val builder = new ProcessBuilder(SERVER_PROGRAM.toString,
