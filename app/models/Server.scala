@@ -10,14 +10,15 @@ import java.io.{File, InputStreamReader, BufferedReader}
  */
 
 class Server(val battle: Battle, val port: Int)
-  extends Thread {
+extends Thread {
 
-  val GAME_TIMEOUT = 10000
+  val ROUND_TIMEOUT = 2000
+  val GAME_TIMEOUT = 120000
   val SERVER_PROGRAM = new File("/othello-judge/servers/reversi-serv")
 
   override def run() = {
     val builder = new ProcessBuilder(SERVER_PROGRAM.toString,
-      "-p", port.toString, "-t", "500")
+      "-p", port.toString, "-t", ROUND_TIMEOUT.toString)
     builder redirectErrorStream true
     builder directory SERVER_PROGRAM.getParentFile
 

@@ -17,7 +17,7 @@ import scala.actors._
 import scala.actors.Actor._
 
 case class Program(user: String, path: String, version: Int) {
-  val COMPILE_TIMEOUT = 10000
+  val COMPILE_TIMEOUT = 20000
   private val caller = self
 
 
