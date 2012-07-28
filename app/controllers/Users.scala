@@ -12,9 +12,11 @@ import views._
  * Time: 2:20 PM
  */
 
-object Users {
+object Users extends Controller with Secured {
 
-  def index = Action {
-    Ok(html.users.index("Your new application is ready."))
+  def index = IsAuthenticated { username => _ =>
+    User.findByEmail(username).map { user =>
+      Ok(html.users.index(user))
+    }.getOrElse(Forbidden)
   }
 }
