@@ -9,7 +9,6 @@ package models
  */
 
 import java.io._
-import scala.io._
 import java.util.zip.{ZipEntry, ZipFile}
 import java.util.Enumeration
 import org.apache.commons.io.FileUtils
