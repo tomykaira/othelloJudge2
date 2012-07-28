@@ -13,7 +13,6 @@ class Server(val battle: Battle, val port: Int)
 extends Thread {
 
   val ROUND_TIMEOUT = 2000
-  val GAME_TIMEOUT = 120000
   val SERVER_PROGRAM = new File("/othello-judge/servers/reversi-serv")
 
   override def run() = {
@@ -31,7 +30,6 @@ extends Thread {
     while({line = bufferedReader.readLine; line != null}){
       stringBuilder.append(line)
       stringBuilder.append("\n")
-      println("\t" + line)
     }
     bufferedReader.close
 
