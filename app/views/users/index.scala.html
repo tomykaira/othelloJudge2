@@ -1,4 +1,5 @@
 @(user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
+@import views.users.MyHelpers._
 
 @main("My page") {
 
@@ -27,7 +28,7 @@
 <h2>Players</h2>
 <ul>
     @users.map { u =>
-        <li>@u._1.name @u._2.version</li>
+        <li><a href="/user/new-battle/@urlEncode(u._1.email)">@u._1.name</a> @u._2.version</li>
     }
 </ul>
 

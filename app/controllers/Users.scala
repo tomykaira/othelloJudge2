@@ -65,4 +65,17 @@ object Users extends Controller with Secured {
       )
     }
   }
+
+  def newBattle(opponentEmail: String) = IsAuthenticated { username => implicit request =>
+    def latestOfPrograms(programs: Seq[Program]) = programs.reduceLeft {
+      (latest: Program, p) => if (latest.version < p.version) p else latest
+    }
+    val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
+    val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
+
+    Battle.create(latestChallengerProgram, latestOpponentProgram)
+    Redirect(routes.Users.index).flashing(
+      "success" -> "Battle started"
+    )
+  }
 }

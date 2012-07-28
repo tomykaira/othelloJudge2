@@ -75,8 +75,11 @@ object Battle {
 
       SQL(
         """
-          insert into battle values (
-            {id}, {cmail}, {cv}, {omail}, {ov}, {defaultStatus}, ""
+          insert into battle
+          (id, challenger_mail, challenger_version,
+          opponent_mail, opponent_version, status, output)
+           values (
+            {id}, {cmail}, {cv}, {omail}, {ov}, {defaultStatus}, {output}
           )
         """
       ).on(
@@ -84,7 +87,9 @@ object Battle {
         'cmail -> challenger.user,
         'cv -> challenger.version,
         'omail -> opponent.user,
-        'defaultStatus -> Running().toString
+        'ov -> opponent.version,
+        'defaultStatus -> Running().toString,
+        'output -> ""
       ).executeUpdate()
 
       Battle(id, challenger.user, challenger.version,
