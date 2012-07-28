@@ -78,7 +78,7 @@ object Program {
    * Parse a User from a ResultSet
    */
   val simple = {
-    get[String]("user.email") ~
+    get[String]("program.email") ~
       get[String]("program.path") ~
       get[Int]("program.version") map {
       case email~path~version => Program(email, path, version)

@@ -1,4 +1,4 @@
-@(user: User, battles: Seq[Battle])(implicit flash: Flash)
+@(user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
 
 @main("My page") {
 
@@ -23,6 +23,13 @@
     </p>
 
 </form>
+
+<h2>Your opponents</h2>
+<ul>
+    @users.map { u =>
+        <li>@u._1.name @u._2.version</li>
+    }
+</ul>
 
 <h2>All battles</h2>
 <table>
