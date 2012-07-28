@@ -9,6 +9,7 @@ package models
 
 import play.api.db._
 import play.api.Play.current
+import play.Logger
 
 import anorm._
 import anorm.SqlParser._
@@ -34,25 +35,31 @@ case class Program(user: String, path: String, version: Int) {
     outputReader ! proc
 
     receiveWithin(COMPILE_TIMEOUT) {
-      case TIMEOUT => None
+      case TIMEOUT => {
+        Logger.warn("Compile of " + this + " is not finished")
+        None
+      }
       case result: String => {
         val executable = new File(dir, "reversi")
         if (executable.exists)
           Some(executable)
-        else
+        else {
+          Logger.warn("Compile of " + this + " is finished, but reversi does not exist")
           None
+        }
       }
     }
   }
+
+  override def toString =
+    user + "[" + version + "]"
 
   private def tempDirectory =
     new File(new File(path).getParent(), System.currentTimeMillis.toString)
 
   private val outputReader = actor {
     loop {
-      reactWithin(COMPILE_TIMEOUT) {
-        case TIMEOUT =>
-          caller ! "react timeout"
+      react {
         case proc:Process => {
           val streamReader = new InputStreamReader(proc.getInputStream)
           val bufferedReader = new BufferedReader(streamReader)
