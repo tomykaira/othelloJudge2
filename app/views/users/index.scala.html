@@ -15,13 +15,12 @@
 </p>
 }
 <h2>Upload your program</h2>
-@form(action = routes.Users.upload, 'enctype -> "multipart/form-data") {
+<form method="post" action="/user/upload" enctype="multipart/form-data">
+    <input type="file" name="program">
 
-<input type="file" name="program">
+    <p>
+        <input type="submit" value="Upload program">
+    </p>
 
-<p>
-    <input type="submit">
-</p>
-
-}
+</form>
 }
