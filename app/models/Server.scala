@@ -31,7 +31,6 @@ extends Thread {
     while({line = bufferedReader.readLine; line != null}){
       stringBuilder.append(line)
       stringBuilder.append("\n")
-      println("\t" + line)
     }
     bufferedReader.close
 

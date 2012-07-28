@@ -10,6 +10,7 @@ package models
 
 import play.api.db._
 import play.api.Play.current
+import play.Logger
 
 import anorm._
 import anorm.SqlParser._
@@ -28,10 +29,9 @@ case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
     val port = System.currentTimeMillis.toInt % 1000 + 30000
     val server = new Server(this, port)
 
-    println("matchmaking...")
+    Logger.info("matchmaking " + shortInfo)
     if (challenger.isDefined && opponent.isDefined) {
 
-      println("both programs are OK. starting server")
       server.start()
       Thread.sleep(100)
       challenger.get.run(port)
@@ -39,6 +39,10 @@ case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
     } else {
       BattleRecorder.report(AbnormalExit(this, "client not created"))
     }
+  }
+
+  def shortInfo = {
+    "[" + id + "] " + challengerMail + " vs. " + opponentMail
   }
 }
 
