@@ -1,7 +1,19 @@
 @(message: String)
 
-@main("Welcome to Play 2.0") {
-    
-    @play20.welcome(message)
-    
+@main("Welcome") {
+
+    <h1>Welcome to Othello Judge 2012</h1>
+
+    <a href="/login">Login</a> or <a href="/user/new">Register</a>
+
+    <h2>Regurations</h2>
+    <ul>
+        <li>アップロードするファイルは zip 圧縮。unarchive したときに Makefile が出てくこと(ディレクトリをふくまない)</li>
+        <li>make できればなんでもいいが、普通のプログラムでもライブラリがなかったりで make できないかもしれないのでできなかったら連絡する</li>
+        <li>make したら reversi という名前のバイナリを生成すること</li>
+        <li>10秒以内にコンパイルがおわること (おわらないとなかったことに)</li>
+        <li>バイナリは localhost とポート番号を受け取ること</li>
+        <li>サーバの合計稼働時間が 120 秒以内であること</li>
+    </ul>
+
 }
