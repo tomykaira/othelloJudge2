@@ -19,4 +19,12 @@ object Users extends Controller with Secured {
       Ok(html.users.index(user))
     }.getOrElse(Forbidden)
   }
+
+  def newAccount = Action {
+    Ok(html.users.newAccount())
+  }
+
+  def create = Action {
+
+  }
 }
