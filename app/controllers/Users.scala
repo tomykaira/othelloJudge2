@@ -30,7 +30,7 @@ object Users extends Controller with Secured {
     })
   )
 
-  def index = IsAuthenticated { username => _ =>
+  def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
       Ok(html.users.index(user))
     }.getOrElse(Forbidden)
@@ -47,5 +47,21 @@ object Users extends Controller with Secured {
         "success" -> "Your account is created"
       )
     )
+  }
+
+  def upload = Action(parse.multipartFormData) { request =>
+    request.body.file("program").map { picture =>
+      import java.io.File
+      val filename = picture.filename
+      val contentType = picture.contentType
+      picture.ref.moveTo(new File("/tmp/picture"))
+      Redirect(routes.Users.index).flashing(
+        "success" -> "New program is uploaded"
+      )
+    }.getOrElse {
+      Redirect(routes.Users.index).flashing(
+        "error" -> "Missing file"
+      )
+    }
   }
 }

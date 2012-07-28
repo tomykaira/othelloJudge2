@@ -1,7 +1,27 @@
-@(user: User)
+@(user: User)(implicit flash: Flash)
 
 @main("My page") {
 
 <h1>Welcome @user.name</h1>
 
+@flash.get("success").map { message =>
+<p class="success">
+    @message
+</p>
+}
+@flash.get("error").map { message =>
+<p class="error">
+    @message
+</p>
+}
+<h2>Upload your program</h2>
+@form(action = routes.Users.upload, 'enctype -> "multipart/form-data") {
+
+<input type="file" name="program">
+
+<p>
+    <input type="submit">
+</p>
+
+}
 }
