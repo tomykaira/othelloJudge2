@@ -3,7 +3,7 @@ package controllers
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import models.{Program, User}
+import models.{Battle, Program, User}
 import views._
 /**
  * Users controller
@@ -32,7 +32,8 @@ object Users extends Controller with Secured {
 
   def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
-      Ok(html.users.index(user))
+      val battles = Battle.findAll()
+      Ok(html.users.index(user, battles))
     }.getOrElse(Forbidden)
   }
 

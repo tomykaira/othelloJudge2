@@ -16,7 +16,7 @@ import anorm.SqlParser._
 
 
 case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
-                   opponentMail: String, opponentVersion: Int, result: BattleStatus,
+                   opponentMail: String, opponentVersion: Int, status: BattleStatus,
                    serverOutput: String)
 
 
@@ -45,7 +45,7 @@ object Battle {
   /**
    * Retrieve a User from email.
    */
-  def findByUser(user: String): Seq[Program] = {
+  def findByUser(user: String): Seq[Battle] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -53,14 +53,14 @@ object Battle {
           where challenger_mail = {email} or opponent_mail = {email}
         """.stripMargin).on(
         'email -> user
-      ).as(Program.simple.*)
+      ).as(Battle.simple.*)
     }
   }
 
-  def findAll(): Seq[Program] = {
+  def findAll(): Seq[Battle] = {
     DB.withConnection { implicit connection =>
       SQL(
-        "select * from battle".stripMargin).as(Program.simple.*)
+        "select * from battle".stripMargin).as(Battle.simple.*)
     }
   }
 
@@ -100,7 +100,7 @@ object Battle {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          update program SET status={status}, output = {output}
+          update battle SET status={status}, output = {output}
            where id = {id}
         """
       ).on(
