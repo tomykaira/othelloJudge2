@@ -73,7 +73,7 @@ object Users extends Controller with Secured {
     val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
     val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
 
-    Battle.create(latestChallengerProgram, latestOpponentProgram)
+    Battle.create(latestChallengerProgram, latestOpponentProgram).run()
     Redirect(routes.Users.index).flashing(
       "success" -> "Battle started"
     )

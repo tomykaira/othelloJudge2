@@ -98,6 +98,15 @@ object Program {
     }
   }
 
+  def find(user: String, version: Int): Option[Program] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from program where email = {email} and version = {version}").on(
+        'email -> user,
+        'version -> version
+      ).as(Program.simple.singleOpt)
+    }
+  }
+
   def latestVersion(user: String): Option[Int] = {
     DB.withConnection { implicit connection =>
       SQL("select max(version) as c from program where email = {email}").on(

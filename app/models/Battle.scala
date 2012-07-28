@@ -17,7 +17,31 @@ import anorm.SqlParser._
 
 case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
                    opponentMail: String, opponentVersion: Int, status: BattleStatus,
-                   serverOutput: String)
+                   serverOutput: String) extends Thread {
+
+  override def run() = {
+    val challenger = Program.find(challengerMail, challengerVersion).
+      flatMap(_.prepare()).map(new Client(_))
+    val opponent = Program.find(opponentMail, opponentVersion).
+      flatMap(_.prepare()).map(new Client(_))
+
+    val port = System.currentTimeMillis.toInt % 1000 + 30000
+    val server = new Server(this, port)
+
+    println("matchmaking...")
+    if (challenger.isDefined && opponent.isDefined) {
+
+      println("both programs are OK. starting server")
+      server.start()
+      Thread.sleep(100)
+      challenger.get.run(port)
+      opponent.get.run(port)
+    } else {
+      BattleRecorder.report(AbnormalExit(this, "clienti not created"))
+    }
+  }
+}
+
 
 
 object Battle {
