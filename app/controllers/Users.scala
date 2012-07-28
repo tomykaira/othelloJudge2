@@ -3,7 +3,7 @@ package controllers
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import models.User
+import models.{Program, User}
 import views._
 /**
  * Users controller
@@ -49,12 +49,11 @@ object Users extends Controller with Secured {
     )
   }
 
-  def upload = Action(parse.multipartFormData) { request =>
-    request.body.file("program").map { picture =>
+  def upload = IsAuthenticated { username => implicit request =>
+    request.body.asMultipartFormData.flatMap(_.file("program")).map { file =>
       import java.io.File
-      val filename = picture.filename
-      val contentType = picture.contentType
-      picture.ref.moveTo(new File("/tmp/picture"))
+      val program = Program.create(username)
+      file.ref.moveTo(new File(program.path))
       Redirect(routes.Users.index).flashing(
         "success" -> "New program is uploaded"
       )

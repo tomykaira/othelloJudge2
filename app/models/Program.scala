@@ -12,9 +12,63 @@ import play.api.Play.current
 
 import anorm._
 import anorm.SqlParser._
-import java.io.File
+import java.io.{InputStreamReader, BufferedReader, File}
+import scala.actors._
+import scala.actors.Actor._
 
-case class Program(user: String, path: String, version: Int)
+case class Program(user: String, path: String, version: Int) {
+  val COMPILE_TIMEOUT = 10000
+  private val caller = self
+
+
+  def prepare(): Option[File] = {
+    val dir = tempDirectory
+    FileUtilities.unzipTo(new File(path), dir)
+
+    val builder = new ProcessBuilder("make")
+    builder redirectErrorStream true
+    builder directory dir
+
+    val proc = builder.start
+
+    outputReader ! proc
+
+    receiveWithin(COMPILE_TIMEOUT) {
+      case TIMEOUT => None
+      case result: String => {
+        val executable = new File(dir, "reversi")
+        if (executable.exists)
+          Some(executable)
+        else
+          None
+      }
+    }
+  }
+
+  private def tempDirectory =
+    new File(new File(path).getParent(), System.currentTimeMillis.toString)
+
+  private val outputReader = actor {
+    loop {
+      reactWithin(COMPILE_TIMEOUT) {
+        case TIMEOUT =>
+          caller ! "react timeout"
+        case proc:Process => {
+          val streamReader = new InputStreamReader(proc.getInputStream)
+          val bufferedReader = new BufferedReader(streamReader)
+          val stringBuilder = new StringBuilder()
+          var line:String = null
+          while({line = bufferedReader.readLine; line != null}){
+            stringBuilder.append(line)
+            stringBuilder.append("\n")
+          }
+          bufferedReader.close
+          caller ! stringBuilder.toString
+        }
+      }
+    }
+  }
+}
 
 object Program {
 
@@ -44,19 +98,21 @@ object Program {
     }
   }
 
-  def latestVersion(user: String): Int = {
+  def latestVersion(user: String): Option[Int] = {
     DB.withConnection { implicit connection =>
-      SQL("select max(version) from program where email = {email}").on(
+      SQL("select max(version) as c from program where email = {email}").on(
         'email -> user
-      ).apply().head[Int]("c")
+      ).apply().head[Option[Int]]("c")
     }
   }
 
   /**
    * Create a User.
    */
-  def create(user: User, path: String): Program = {
-    val newVersion = this.latestVersion(user.email) + 1
+  def create(user: String): Program = {
+    val newVersion = this.latestVersion(user).getOrElse(0) + 1
+    val pathSafenName = user.replaceAll("[^a-zA-Z0-9]", "_")
+    val path = "/tmp/" + pathSafenName + "/" + newVersion + ".zip"
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -65,12 +121,12 @@ object Program {
           )
         """
       ).on(
-        'email -> user.email,
+        'email -> user,
         'path -> path,
         'version -> newVersion
       ).executeUpdate()
 
-      Program(user.email, path, newVersion)
+      Program(user, path, newVersion)
 
     }
   }
