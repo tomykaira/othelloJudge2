@@ -61,7 +61,7 @@ object User {
         """
           select * from user INNER JOIN program
           WHERE user.email = program.email
-          AND program.version = (SELECT max(version) as mv from program group by email)
+          AND program.version = (SELECT max(version) as mv from program where email = user.email)
         """
       ).as(
         get[String]("user.email") ~
