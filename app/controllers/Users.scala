@@ -70,12 +70,20 @@ object Users extends Controller with Secured {
     def latestOfPrograms(programs: Seq[Program]) = programs.reduceLeft {
       (latest: Program, p) => if (latest.version < p.version) p else latest
     }
-    val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
-    val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
+    try {
+      val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
+      val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
 
-    Battle.create(latestChallengerProgram, latestOpponentProgram).start()
-    Redirect(routes.Users.index).flashing(
-      "success" -> "Battle started"
-    )
+      Battle.create(latestChallengerProgram, latestOpponentProgram).start()
+      Redirect(routes.Users.index).flashing(
+        "success" -> "Battle started"
+      )
+    } catch {
+      // from programs.reduceLeft
+      case e: UnsupportedOperationException =>
+        Redirect(routes.Users.index).flashing(
+          "error" -> "You have no program yet.  Please upload first."
+        )
+    }
   }
 }
