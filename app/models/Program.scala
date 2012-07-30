@@ -23,7 +23,7 @@ case class Program(user: String, path: String, version: Int) {
 
 
   def prepare(): Option[File] = {
-    val dir = tempDirectory
+    val dir = new File(path.replace(".zip", ""))
     FileUtilities.unzipTo(new File(path), dir)
 
     val builder = new ProcessBuilder("make")
@@ -53,9 +53,6 @@ case class Program(user: String, path: String, version: Int) {
 
   override def toString =
     user + "[" + version + "]"
-
-  private def tempDirectory =
-    new File(new File(path).getParent(), System.currentTimeMillis.toString)
 
   private val outputReader = actor {
     loop {
