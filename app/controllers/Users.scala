@@ -16,9 +16,9 @@ object Users extends Controller with Secured {
 
   val registerForm = Form(
     tuple(
-      "email" -> text,
-      "name" -> text,
-      "password" -> text
+      "email" -> nonEmptyText,
+      "name" -> nonEmptyText,
+      "password" -> nonEmptyText
     ) verifying ("Invalid user information", result => result match {
       case (email, name, password) =>
         try {
