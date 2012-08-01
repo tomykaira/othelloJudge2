@@ -10,7 +10,8 @@ import play.Logger
  * Time: 6:57 PM
  */
 
-class Server(val battle: Battle, val port: Int)
+class Server(val battle: Battle, val challenger: Client, val opponent: Client,
+  val port: Int)
 extends Thread {
 
   val ROUND_TIMEOUT = 2000
@@ -26,12 +27,19 @@ extends Thread {
     try {
       val proc = builder.start
       val streamReader = new InputStreamReader(proc.getInputStream)
-      val bufferedReader = new BufferedReader(streamReader)
+      val bufferedReader = new BufferedReader(streamReader, 1)
       var line:String = null
+      var char: Int = 0
+
+      challenger.run(port)
 
       while({line = bufferedReader.readLine; line != null}){
         stringBuilder.append(line)
         stringBuilder.append("\n")
+        if (line == "One player is registered. Waiting for other player ...") {
+          opponent.run(port)
+          Logger.info("opponent's client is started")
+        }
       }
       bufferedReader.close
 

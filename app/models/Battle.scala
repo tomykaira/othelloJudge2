@@ -27,15 +27,12 @@ case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
       flatMap(_.prepare()).map(new Client(_))
 
     val port = System.currentTimeMillis.toInt % 1000 + 30000
-    val server = new Server(this, port)
 
     Logger.info("matchmaking " + shortInfo)
     if (challenger.isDefined && opponent.isDefined) {
 
+      val server = new Server(this, challenger.get, opponent.get, port)
       server.start()
-      Thread.sleep(100)
-      challenger.get.run(port)
-      opponent.get.run(port)
     } else {
       BattleRecorder.report(AbnormalExit(this, "client not created"))
     }

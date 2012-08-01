@@ -14,17 +14,15 @@ case class NormalExit(val battle: Battle, val stdout: String) extends ProgramExi
 case class AbnormalExit(val battle: Battle, val stdout: String) extends ProgramExit
 
 object OutputParser {
-  val BlackWinsPattern = new Regex("""(?s).*Black wins!.*""")
-  val WhiteWinsPattern = new Regex("""(?s).*White wins!.*""")
-  val WhiteLosePattern = new Regex("""(?s).*White lose..*""")
-  val BlackLosePattern = new Regex("""(?s).*Black lose..*""")
+  val ExitPattern = new Regex("""(?s).*Player (\d) with (Black|White) wins\..*""")
   val EvenPattern = new Regex("""(?s).*\*Even\*..*""")
 
   def parse(output: String): BattleStatus = output match {
-    case BlackWinsPattern() => ChallengerWon()
-    case WhiteLosePattern() => ChallengerWon()
-    case WhiteWinsPattern() => OpponentWon()
-    case BlackLosePattern() => OpponentWon()
+    case ExitPattern(playerId, color) =>
+      if (playerId == "1")
+        ChallengerWon()
+      else
+        OpponentWon()
     case EvenPattern()      => Even()
     case _ => ErrorExit()
   }
