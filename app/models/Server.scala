@@ -14,7 +14,7 @@ class Server(val battle: Battle, val challenger: Client, val opponent: Client,
   val port: Int)
 extends Thread {
 
-  val ROUND_TIMEOUT = 2000
+  val ROUND_TIMEOUT = 60 * 1000
   val SERVER_PROGRAM = new File("/othello-judge/servers/reversi-serv")
 
   override def run() = {
