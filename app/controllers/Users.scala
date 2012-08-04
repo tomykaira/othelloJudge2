@@ -3,7 +3,7 @@ package controllers
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import models.{Battle, Program, User}
+import models._
 import views._
 /**
  * Users controller
@@ -30,11 +30,21 @@ object Users extends Controller with Secured {
     })
   )
 
+  val battleForm = Form(
+    tuple(
+      "email" -> nonEmptyText,
+      "times" -> number
+    ) verifying ("Invalid request", result => result match {
+      case (email, times) =>
+        User.findByEmail(email).isDefined
+    })
+  )
+
   def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
       val battles = Battle.findAll()
       val users = User.findAllWithProgram
-      Ok(html.users.index(user, users, battles))
+      Ok(html.users.index(battleForm, user, users, battles))
     }.getOrElse(Forbidden)
   }
 
@@ -66,24 +76,39 @@ object Users extends Controller with Secured {
     }
   }
 
-  def newBattle(opponentEmail: String) = IsAuthenticated { username => implicit request =>
-    def latestOfPrograms(programs: Seq[Program]) = programs.reduceLeft {
-      (latest: Program, p) => if (latest.version < p.version) p else latest
-    }
-    try {
-      val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
-      val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
+  def newBattle = IsAuthenticated { username => implicit request =>
 
-      Battle.create(latestChallengerProgram, latestOpponentProgram).start()
-      Redirect(routes.Users.index).flashing(
-        "success" -> "Battle started"
-      )
-    } catch {
-      // from programs.reduceLeft
-      case e: UnsupportedOperationException =>
-        Redirect(routes.Users.index).flashing(
-          "error" -> "You have no program yet.  Please upload first."
-        )
-    }
+    battleForm.bindFromRequest.fold ({
+      formWithErrors => Redirect(routes.Users.index).flashing(
+        "error" -> formWithErrors.errors.map(_.message).mkString
+      )}, { (result) => {
+        def latestOfPrograms(programs: Seq[Program]) = programs.reduceLeft {
+          (latest: Program, p) => if (latest.version < p.version) p else latest
+        }
+
+        val (opponentEmail, times) = result
+
+        try {
+          val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
+          val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
+
+          import List._
+
+          fill(times) {
+            BattleWorker ! Battle.create(latestChallengerProgram, latestOpponentProgram)
+          }
+
+          Redirect(routes.Users.index).flashing(
+            "success" -> "Battle started"
+          )
+        } catch {
+          // from programs.reduceLeft
+          case e: UnsupportedOperationException =>
+            Redirect(routes.Users.index).flashing(
+              "error" -> "You have no program yet.  Please upload first."
+            )
+        }
+      }
+    })
   }
 }

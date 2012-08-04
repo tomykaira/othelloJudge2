@@ -11,11 +11,16 @@ import java.io.File
 
 class Client(val path: File) {
 
+  private var process: Process = null
+
   def run(port: Int): Process = {
     val builder = new ProcessBuilder(path.toString, "localhost", port.toString)
     builder redirectErrorStream false
     builder directory path.getParentFile
 
-    builder.start
+    process = builder.start()
+    process
   }
+
+  def destroy(): Unit = if (process == null) process.destroy
 }

@@ -1,4 +1,4 @@
-@(user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
+@(form: Form[(String, Int)], user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
 @import views.users.MyHelpers._
 
 @main("My page") {
@@ -26,11 +26,25 @@
 </form>
 
 <h2>Players</h2>
+@form.globalError.map { error =>
+<p class="error">
+    @error.message
+</p>
+}
+@helper.form(routes.Users.newBattle) {
 <ul>
+
     @users.map { u =>
-        <li><a href="/user/new-battle/@urlEncode(u._1.email)">@u._1.name</a> @u._2.version</li>
+        <li><label>
+            <input type="radio" name="email" id="email_@u._1.name" value="@u._1.email" />
+            @u._1.name @u._2.version
+        </label></li>
     }
 </ul>
+
+@helper.inputText(form("times"), 'id -> "times", 'size -> 10, 'value -> 1)
+<button type="submit" id="create">Start battle</button>
+}
 
 <h2>All battles</h2>
 <table>

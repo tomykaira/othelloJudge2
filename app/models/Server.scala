@@ -47,6 +47,9 @@ extends Thread {
 
       proc.waitFor
 
+      challenger.destroy()
+      opponent.destroy()
+
       if (proc.exitValue == 0) {
         BattleRecorder.report(NormalExit(battle, result))
       } else {
