@@ -5,9 +5,12 @@ import java.io.{InputStreamReader, BufferedReader}
 class ProgramThread(builder: ProcessBuilder) extends Thread {
   private var process: Process = null
   private val stringBuilder = new StringBuilder()
-  private var callback: Option[String => Unit] = None
+  private var lineCallback: Option[String => Unit] = None
+  private var afterCallback: Option[Int => Unit] = None
 
-  def setCallback(acb: String => Unit) = callback = Some(acb)
+  def setLineCallback(acb: String => Unit) = lineCallback = Some(acb)
+
+  def setAfterCallback(acb: Int => Unit) = afterCallback = Some(acb)
 
   override def run() = {
     process = builder.start
@@ -18,11 +21,13 @@ class ProgramThread(builder: ProcessBuilder) extends Thread {
     while({line = bufferedReader.readLine; line != null}){
       stringBuilder.append(line)
       stringBuilder.append("\n")
-      callback.map(_(line))
+      lineCallback.map(_(line))
     }
     bufferedReader.close
 
     process.waitFor
+
+    afterCallback.map(_(exitValue))
   }
 
   def waitFor: Unit = if (process != null) process.waitFor

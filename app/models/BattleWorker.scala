@@ -18,7 +18,7 @@ object BattleWorker extends Actor {
         if (challenger.isDefined && opponent.isDefined) {
 
           val server = new Server(m, challenger.get, opponent.get, port)
-          server.start()
+          server.run()
         } else {
           BattleRecorder.report(AbnormalExit(m, "client not created"))
         }

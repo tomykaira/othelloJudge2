@@ -11,13 +11,12 @@ import play.Logger
  */
 
 class Server(val battle: Battle, val challenger: Client, val opponent: Client,
-  val port: Int)
-extends Thread {
+  val port: Int) {
 
   val ROUND_TIMEOUT = 60 * 1000
   val SERVER_PROGRAM = new File("/othello-judge/servers/reversi-serv")
 
-  override def run() = {
+  def run() = {
     val builder = new ProcessBuilder(SERVER_PROGRAM.toString,
       "-p", port.toString, "-t", ROUND_TIMEOUT.toString)
     builder redirectErrorStream true
@@ -25,7 +24,7 @@ extends Thread {
 
     try {
       val pt = new ProgramThread(builder)
-      pt.setCallback { line =>
+      pt.setLineCallback { line =>
         if (line == "Waiting connections ... ") {
           println("invoking")
           challenger.run(port)
@@ -37,17 +36,19 @@ extends Thread {
         }
       }
 
-      pt.start
-      pt.join
+      pt.setAfterCallback { exitValue =>
+        challenger.destroy()
+        opponent.destroy()
 
-      challenger.destroy()
-      opponent.destroy()
-
-      if (pt.exitValue == 0) {
-        BattleRecorder.report(NormalExit(battle, pt.getOutput))
-      } else {
-        BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
+        if (exitValue == 0) {
+          BattleRecorder.report(NormalExit(battle, pt.getOutput))
+        } else {
+          BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
+        }
       }
+
+      pt.start
+
     } catch {
       case e: Exception =>
         Logger.error("Othello server error", e)
