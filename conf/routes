@@ -12,7 +12,7 @@ GET     /user                       controllers.Users.index
 POST    /user                       controllers.Users.create
 GET     /user/new                   controllers.Users.newAccount
 POST    /user/upload                controllers.Users.upload
-GET     /user/new-battle/*email     controllers.Users.newBattle(email: String)
+POST    /user/new-battle            controllers.Users.newBattle
 
 GET     /battles/:id                controllers.Battles.show(id: Long)
 
