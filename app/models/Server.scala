@@ -2,6 +2,7 @@ package models
 
 import java.io.{File}
 import play.Logger
+import java.lang.Thread.UncaughtExceptionHandler
 
 /**
  * Server runner
@@ -22,38 +23,37 @@ class Server(val battle: Battle, val challenger: Client, val opponent: Client,
     builder redirectErrorStream true
     builder directory SERVER_PROGRAM.getParentFile
 
-    try {
-      val pt = new ProgramThread(builder)
-      pt.setLineCallback { line =>
-        if (line == "Waiting connections ... ") {
-          println("invoking")
-          challenger.run(port)
-          Logger.info("challenger's client is started")
-        }
-        if (line == "One player is registered. Waiting for other player ...") {
-          opponent.run(port)
-          Logger.info("opponent's client is started")
-        }
+    val pt = new ProgramThread(builder)
+    pt.setLineCallback { line =>
+      if (line == "Waiting connections ... ") {
+        println("invoking")
+        challenger.start(port)
+        Logger.info("challenger's client is started")
       }
-
-      pt.setAfterCallback { exitValue =>
-        challenger.destroy()
-        opponent.destroy()
-
-        if (exitValue == 0) {
-          BattleRecorder.report(NormalExit(battle, pt.getOutput))
-        } else {
-          BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
-        }
+      if (line == "One player is registered. Waiting for other player ...") {
+        opponent.start(port)
+        Logger.info("opponent's client is started")
       }
-
-      pt.start
-
-    } catch {
-      case e: Exception =>
-        Logger.error("Othello server error", e)
-        BattleRecorder.report(AbnormalExit(battle, e.toString()))
     }
 
+    pt.setAfterCallback { exitValue =>
+      challenger.forceExit
+      opponent.forceExit
+
+      if (exitValue == 0) {
+        BattleRecorder.report(NormalExit(battle, pt.getOutput))
+      } else {
+        BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
+      }
+    }
+
+    pt.setUncaughtExceptionHandler(new UncaughtExceptionHandler {
+      override def uncaughtException(t: Thread, e: Throwable) = {
+        Logger.error("Othello server error", e)
+        BattleRecorder.report(AbnormalExit(battle, e.toString()))
+      }
+    })
+
+    pt.start
   }
 }

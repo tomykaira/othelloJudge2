@@ -2,7 +2,7 @@ package models
 
 import java.io.{InputStreamReader, BufferedReader}
 
-class ProgramThread(builder: ProcessBuilder) extends Thread {
+class ProgramThread(protected val builder: ProcessBuilder) extends Thread {
   private var process: Process = null
   private val stringBuilder = new StringBuilder()
   private var lineCallback: Option[String => Unit] = None
