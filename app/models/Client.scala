@@ -1,6 +1,8 @@
 package models
 
 import java.io.File
+import play.Logger
+import java.lang.Thread.UncaughtExceptionHandler
 
 /**
  * Client program runner
@@ -9,18 +11,23 @@ import java.io.File
  * Time: 6:56 PM
  */
 
-class Client(val path: File) {
+class Client(val path: File) extends ProgramThread(new ProcessBuilder()) {
 
-  private var process: Process = null
-
-  def run(port: Int): Process = {
-    val builder = new ProcessBuilder(path.toString, "localhost", port.toString)
+  def start(port: Int): Unit = {
+    builder.command(path.toString, "localhost", port.toString)
     builder redirectErrorStream false
     builder directory path.getParentFile
 
-    process = builder.start()
-    process
-  }
+    setAfterCallback { exitValue =>
+      println(getOutput)
+    }
 
-  def destroy(): Unit = if (process != null) process.destroy
+    setUncaughtExceptionHandler(new UncaughtExceptionHandler {
+      override def uncaughtException(t: Thread, e: Throwable) = {
+        Logger.error("Othello client error", e)
+      }
+    })
+
+    start()
+  }
 }
