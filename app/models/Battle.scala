@@ -18,9 +18,9 @@ import anorm.SqlParser._
 
 case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
                    opponentMail: String, opponentVersion: Int, status: BattleStatus,
-                   serverOutput: String) extends Thread {
+                   serverOutput: String) {
 
-  override def run() = {
+  def run() = {
     val challenger = Program.find(challengerMail, challengerVersion).
       flatMap(_.prepare()).map(new Client(_))
     val opponent = Program.find(opponentMail, opponentVersion).

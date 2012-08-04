@@ -3,7 +3,7 @@ package controllers
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import models.{Battle, Program, User}
+import models._
 import views._
 /**
  * Users controller
@@ -74,7 +74,7 @@ object Users extends Controller with Secured {
       val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
       val latestOpponentProgram = latestOfPrograms( Program.findByUser(opponentEmail) )
 
-      Battle.create(latestChallengerProgram, latestOpponentProgram).start()
+      BattleWorker ! Battle.create(latestChallengerProgram, latestOpponentProgram)
       Redirect(routes.Users.index).flashing(
         "success" -> "Battle started"
       )
