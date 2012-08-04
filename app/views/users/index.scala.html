@@ -48,7 +48,7 @@
 
 <h2>All battles</h2>
 <table>
-@battles.map { battle =>
+@battles.reverse.map { battle =>
     <tr>
         <td>@battle.challengerMail</td><td>@battle.challengerVersion</td>
         <td>@battle.opponentMail</td><td>@battle.opponentVersion</td>
