@@ -22,5 +22,5 @@ class Client(val path: File) {
     process
   }
 
-  def destroy(): Unit = if (process == null) process.destroy
+  def destroy(): Unit = if (process != null) process.destroy
 }

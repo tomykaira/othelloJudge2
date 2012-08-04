@@ -1,6 +1,6 @@
 package models
 
-import java.io.{File, InputStreamReader, BufferedReader}
+import java.io.{File}
 import play.Logger
 
 /**
@@ -20,40 +20,33 @@ extends Thread {
   override def run() = {
     val builder = new ProcessBuilder(SERVER_PROGRAM.toString,
       "-p", port.toString, "-t", ROUND_TIMEOUT.toString)
-    val stringBuilder = new StringBuilder()
     builder redirectErrorStream true
     builder directory SERVER_PROGRAM.getParentFile
 
     try {
-      val proc = builder.start
-      val streamReader = new InputStreamReader(proc.getInputStream)
-      val bufferedReader = new BufferedReader(streamReader, 1)
-      var line:String = null
-      var char: Int = 0
-
-      challenger.run(port)
-
-      while({line = bufferedReader.readLine; line != null}){
-        stringBuilder.append(line)
-        stringBuilder.append("\n")
+      val pt = new ProgramThread(builder)
+      pt.setCallback { line =>
+        if (line == "Waiting connections ... ") {
+          println("invoking")
+          challenger.run(port)
+          Logger.info("challenger's client is started")
+        }
         if (line == "One player is registered. Waiting for other player ...") {
           opponent.run(port)
           Logger.info("opponent's client is started")
         }
       }
-      bufferedReader.close
 
-      val result = stringBuilder.toString
-
-      proc.waitFor
+      pt.start
+      pt.join
 
       challenger.destroy()
       opponent.destroy()
 
-      if (proc.exitValue == 0) {
-        BattleRecorder.report(NormalExit(battle, result))
+      if (pt.exitValue == 0) {
+        BattleRecorder.report(NormalExit(battle, pt.getOutput))
       } else {
-        BattleRecorder.report(AbnormalExit(battle, result))
+        BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
       }
     } catch {
       case e: Exception =>
