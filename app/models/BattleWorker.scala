@@ -15,17 +15,24 @@ object BattleWorker extends Actor {
         val port = System.currentTimeMillis.toInt % 1000 + 30000
 
         Logger.info("matchmaking " + m.shortInfo)
-        if (black.isDefined && white.isDefined) {
 
-          val server = new Server(m, black.get, white.get, port)
-          server.run()
-        } else {
-          BattleRecorder.report(AbnormalExit(m, "client not created"))
+        (black, white) match {
+          case (Right(b), Right(w)) =>
+            val server = new Server(m, b, w, port)
+            server.run()
+          case (Left(mb), Right(_)) =>
+            BattleRecorder.report(AbnormalExit(m, "client not created"), mb, "")
+          case (Right(_), Left(mw)) =>
+            BattleRecorder.report(AbnormalExit(m, "client not created"), "", mw)
+          case (Left(mb), Left(mw)) =>
+            BattleRecorder.report(AbnormalExit(m, "client not created"), mb, mw)
         }
       }
     }
   }
 
-  private def compiledClient(mail: String, version: Int): Option[Client] =
-    Program.find(mail, version).flatMap(_.prepare()).map(new Client(_))
+  private def compiledClient(mail: String, version: Int): Either[String, Client] =
+    Program.find(mail, version).toRight("program not found in DB")
+      .fold(l => Left(l), r => r.prepare())
+      .fold(l => Left(l), r => Right(new Client(r)))
 }

@@ -22,12 +22,12 @@ case class Program(user: String, path: String, version: Int) {
   private val caller = self
 
 
-  def prepare(): Option[File] = {
+  def prepare(): Either[String, File] = {
     val dir = new File(path.replace(".zip", ""))
     val executable = new File(dir, "reversi")
 
     if (executable.exists)
-      return Some(executable)
+      return Right(executable)
 
     FileUtilities.unzipTo(new File(path), dir)
 
@@ -41,15 +41,13 @@ case class Program(user: String, path: String, version: Int) {
 
     receiveWithin(COMPILE_TIMEOUT) {
       case TIMEOUT => {
-        Logger.warn("Compile of " + this + " is not finished")
-        None
+        Left("Compile of " + this + " is not finished")
       }
       case result: String => {
         if (executable.exists)
-          Some(executable)
+          Right(executable)
         else {
-          Logger.warn("Compile of " + this + " is finished, but reversi does not exist \n" + result)
-          None
+          Left("Compile of " + this + " is finished, but reversi does not exist \n" + result)
         }
       }
     }

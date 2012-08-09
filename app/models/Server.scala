@@ -27,11 +27,11 @@ class Server(val battle: Battle, val black: Client, val white: Client,
     pt.setLineCallback { line =>
       if (line == "Waiting connections ... ") {
         black.start(port)
-        Logger.info("challenger's client is started")
+        Logger.info("black's client is started")
       }
       if (line == "One player is registered. Waiting for other player ...") {
         white.start(port)
-        Logger.info("opponent's client is started")
+        Logger.info("white's client is started")
       }
     }
 
@@ -40,16 +40,19 @@ class Server(val battle: Battle, val black: Client, val white: Client,
       white.forceExit
 
       if (exitValue == 0) {
-        BattleRecorder.report(NormalExit(battle, pt.getOutput))
+        BattleRecorder.report(NormalExit(battle, pt.getOutput),
+          black.getOutput, white.getOutput)
       } else {
-        BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
+        BattleRecorder.report(AbnormalExit(battle, pt.getOutput),
+          black.getOutput, white.getOutput)
       }
     }
 
     pt.setUncaughtExceptionHandler(new UncaughtExceptionHandler {
       override def uncaughtException(t: Thread, e: Throwable) = {
         Logger.error("Othello server error", e)
-        BattleRecorder.report(AbnormalExit(battle, e.toString()))
+        BattleRecorder.report(AbnormalExit(battle, e.toString()),
+          black.getOutput, white.getOutput)
       }
     })
 

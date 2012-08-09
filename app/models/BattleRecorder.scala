@@ -29,10 +29,11 @@ object OutputParser {
 }
 
 object BattleRecorder {
-  def report (exit: ProgramExit) = exit match {
-    case NormalExit(b, m) =>
-      Battle.update(b.id, OutputParser.parse(m), m)
-    case AbnormalExit(b, m) =>
-      Battle.update(b.id, ErrorExit(), m)
-  }
+  def report (exit: ProgramExit, blackOutput: String, whiteOutput: String) =
+    exit match {
+      case NormalExit(b, m) =>
+        Battle.update(b.id, OutputParser.parse(m), m, blackOutput, whiteOutput)
+      case AbnormalExit(b, m) =>
+        Battle.update(b.id, ErrorExit(), m, blackOutput, whiteOutput)
+    }
 }
