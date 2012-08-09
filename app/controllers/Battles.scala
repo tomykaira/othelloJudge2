@@ -15,10 +15,10 @@ object Battles extends Controller {
   def show (id: Long) = Action {
     Battle.findById(id).map { battle =>
       val output = List(
-        "Challenger: " + battle.challengerMail,
-        "Version: " + battle.challengerVersion,
-        "Opponent: " + battle.opponentMail,
-        "Version: " + battle.opponentVersion,
+        "Black: " + battle.blackMail,
+        "Version: " + battle.blackVersion,
+        "White: " + battle.whiteMail,
+        "Version: " + battle.whiteVersion,
         "Result: " + battle.status,
         "Server output: " + battle.serverOutput
       )

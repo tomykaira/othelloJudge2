@@ -1,4 +1,4 @@
-@(form: Form[(String, Int)], user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
+@(form: Form[(String, Int, Int)], user: User, users: Seq[(User, Program)], battles: Seq[Battle])(implicit flash: Flash)
 @import views.users.MyHelpers._
 
 @main("My page") {
@@ -42,7 +42,8 @@
     }
 </ul>
 
-@helper.inputText(form("times"), 'id -> "times", 'size -> 10, 'value -> 1)
+@helper.inputText(form("blackTimes"), 'id -> "blackTimes", 'size -> 10, 'value -> 1)
+@helper.inputText(form("whiteTimes"), 'id -> "whiteTimes", 'size -> 10, 'value -> 1)
 <button type="submit" id="create">Start battle</button>
 }
 
@@ -50,8 +51,8 @@
 <table>
 @battles.reverse.map { battle =>
     <tr>
-        <td>@battle.challengerMail</td><td>@battle.challengerVersion</td>
-        <td>@battle.opponentMail</td><td>@battle.opponentVersion</td>
+        <td>@battle.blackMail</td><td>@battle.blackVersion</td>
+        <td>@battle.whiteMail</td><td>@battle.whiteVersion</td>
         <td>@battle.status</td><td><a href="/battles/@battle.id">detail</a></td>
     </tr>
 }

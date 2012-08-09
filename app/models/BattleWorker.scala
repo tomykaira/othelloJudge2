@@ -9,15 +9,15 @@ object BattleWorker extends Actor {
     react {
       case m: Battle => {
 
-        val challenger = compiledClient(m.challengerMail, m.challengerVersion)
-        val opponent = compiledClient(m.opponentMail, m.opponentVersion)
+        val black = compiledClient(m.blackMail, m.blackVersion)
+        val white = compiledClient(m.whiteMail, m.whiteVersion)
 
         val port = System.currentTimeMillis.toInt % 1000 + 30000
 
         Logger.info("matchmaking " + m.shortInfo)
-        if (challenger.isDefined && opponent.isDefined) {
+        if (black.isDefined && white.isDefined) {
 
-          val server = new Server(m, challenger.get, opponent.get, port)
+          val server = new Server(m, black.get, white.get, port)
           server.run()
         } else {
           BattleRecorder.report(AbnormalExit(m, "client not created"))

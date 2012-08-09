@@ -20,9 +20,9 @@ object OutputParser {
   def parse(output: String): BattleStatus = output match {
     case ExitPattern(playerId, color) =>
       if (playerId == "1")
-        ChallengerWon()
+        BlackWon()
       else
-        OpponentWon()
+        WhiteWon()
     case EvenPattern()      => Even()
     case _ => ErrorExit()
   }

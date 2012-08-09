@@ -33,9 +33,10 @@ object Users extends Controller with Secured {
   val battleForm = Form(
     tuple(
       "email" -> nonEmptyText,
-      "times" -> number
+      "blackTimes" -> number,
+      "whiteTimes" -> number
     ) verifying ("Invalid request", result => result match {
-      case (email, times) =>
+      case (email, blackTimes, whiteTimes) =>
         User.findByEmail(email).isDefined
     })
   )
@@ -86,7 +87,7 @@ object Users extends Controller with Secured {
           (latest: Program, p) => if (latest.version < p.version) p else latest
         }
 
-        val (opponentEmail, times) = result
+        val (opponentEmail, blackTimes, whiteTimes) = result
 
         try {
           val latestChallengerProgram = latestOfPrograms( Program.findByUser(username) )
@@ -94,8 +95,11 @@ object Users extends Controller with Secured {
 
           import List._
 
-          fill(times) {
+          fill(blackTimes) {
             BattleWorker ! Battle.create(latestChallengerProgram, latestOpponentProgram)
+          }
+          fill(whiteTimes) {
+            BattleWorker ! Battle.create(latestOpponentProgram, latestChallengerProgram)
           }
 
           Redirect(routes.Users.index).flashing(
