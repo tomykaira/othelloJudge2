@@ -117,17 +117,21 @@ object Battle {
   /**
    * Update status
    */
-  def update(id:Long, status: BattleStatus, output: String): Unit = {
+  def update(id:Long, status: BattleStatus, server: String,
+    black: String, white: String): Unit = {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          update battle SET status={status}, server_output = {output}
+          update battle SET status={status}, server_output = {server},
+           black_output = {black}, white_output = {white}
            where id = {id}
         """
       ).on(
         'id -> id,
         'status -> status.toString,
-        'output -> output
+        'server -> server,
+        'black -> black,
+        'white -> white
       ).executeUpdate()
       ()
     }

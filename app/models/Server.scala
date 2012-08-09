@@ -39,20 +39,20 @@ class Server(val battle: Battle, val black: Client, val white: Client,
       black.forceExit
       white.forceExit
 
-      Logger.info(black.getOutput)
-      Logger.info(white.getOutput)
-
       if (exitValue == 0) {
-        BattleRecorder.report(NormalExit(battle, pt.getOutput))
+        BattleRecorder.report(NormalExit(battle, pt.getOutput),
+          black.getOutput, white.getOutput)
       } else {
-        BattleRecorder.report(AbnormalExit(battle, pt.getOutput))
+        BattleRecorder.report(AbnormalExit(battle, pt.getOutput),
+          black.getOutput, white.getOutput)
       }
     }
 
     pt.setUncaughtExceptionHandler(new UncaughtExceptionHandler {
       override def uncaughtException(t: Thread, e: Throwable) = {
         Logger.error("Othello server error", e)
-        BattleRecorder.report(AbnormalExit(battle, e.toString()))
+        BattleRecorder.report(AbnormalExit(battle, e.toString()),
+          black.getOutput, white.getOutput)
       }
     })
 
