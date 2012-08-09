@@ -27,17 +27,20 @@ class Server(val battle: Battle, val black: Client, val white: Client,
     pt.setLineCallback { line =>
       if (line == "Waiting connections ... ") {
         black.start(port)
-        Logger.info("challenger's client is started")
+        Logger.info("black's client is started")
       }
       if (line == "One player is registered. Waiting for other player ...") {
         white.start(port)
-        Logger.info("opponent's client is started")
+        Logger.info("white's client is started")
       }
     }
 
     pt.setAfterCallback { exitValue =>
       black.forceExit
       white.forceExit
+
+      Logger.info(black.getOutput)
+      Logger.info(white.getOutput)
 
       if (exitValue == 0) {
         BattleRecorder.report(NormalExit(battle, pt.getOutput))

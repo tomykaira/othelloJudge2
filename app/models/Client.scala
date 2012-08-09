@@ -18,10 +18,6 @@ class Client(val path: File) extends ProgramThread(new ProcessBuilder()) {
     builder redirectErrorStream false
     builder directory path.getParentFile
 
-    setAfterCallback { exitValue =>
-      println(getOutput)
-    }
-
     setUncaughtExceptionHandler(new UncaughtExceptionHandler {
       override def uncaughtException(t: Thread, e: Throwable) = {
         Logger.error("Othello client error", e)

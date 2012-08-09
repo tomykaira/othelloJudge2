@@ -35,12 +35,12 @@ object Battle {
    */
   val simple = {
     get[Int]("battle.id") ~
-      get[String]("battle.challenger_mail") ~
-      get[Int]("battle.challenger_version") ~
-      get[String]("battle.opponent_mail") ~
-      get[Int]("battle.opponent_version") ~
+      get[String]("battle.black_mail") ~
+      get[Int]("battle.black_version") ~
+      get[String]("battle.white_mail") ~
+      get[Int]("battle.white_version") ~
       get[String]("battle.status") ~
-      get[String]("battle.output") map {
+      get[String]("battle.server_output") map {
       case id~cmail~cv~omail~ov~status~output =>
         Battle(id, cmail, cv, omail, ov, BattleStatus.read(status), output)
     }
@@ -56,7 +56,7 @@ object Battle {
       SQL(
         """
           select * from battle
-          where challenger_mail = {email} or opponent_mail = {email}
+          where black_mail = {email} or white_mail = {email}
         """.stripMargin).on(
         'email -> user
       ).as(Battle.simple.*)
@@ -88,10 +88,10 @@ object Battle {
       SQL(
         """
           insert into battle
-          (id, challenger_mail, challenger_version,
-          opponent_mail, opponent_version, status, output)
+          (id, black_mail, black_version,
+          white_mail, white_version, status, server_output, black_output, white_output)
            values (
-            {id}, {cmail}, {cv}, {omail}, {ov}, {defaultStatus}, {output}
+            {id}, {cmail}, {cv}, {omail}, {ov}, {defaultStatus}, {output}, '', ''
           )
         """
       ).on(
@@ -117,7 +117,7 @@ object Battle {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          update battle SET status={status}, output = {output}
+          update battle SET status={status}, server_output = {output}
            where id = {id}
         """
       ).on(
