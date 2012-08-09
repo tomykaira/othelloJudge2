@@ -26,7 +26,6 @@ class Server(val battle: Battle, val challenger: Client, val opponent: Client,
     val pt = new ProgramThread(builder)
     pt.setLineCallback { line =>
       if (line == "Waiting connections ... ") {
-        println("invoking")
         challenger.start(port)
         Logger.info("challenger's client is started")
       }

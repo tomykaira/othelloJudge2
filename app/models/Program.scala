@@ -24,6 +24,11 @@ case class Program(user: String, path: String, version: Int) {
 
   def prepare(): Option[File] = {
     val dir = new File(path.replace(".zip", ""))
+    val executable = new File(dir, "reversi")
+
+    if (executable.exists)
+      return Some(executable)
+
     FileUtilities.unzipTo(new File(path), dir)
 
     val builder = new ProcessBuilder("make")
@@ -40,7 +45,6 @@ case class Program(user: String, path: String, version: Int) {
         None
       }
       case result: String => {
-        val executable = new File(dir, "reversi")
         if (executable.exists)
           Some(executable)
         else {
