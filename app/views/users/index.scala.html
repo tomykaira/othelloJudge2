@@ -51,8 +51,8 @@
 <table>
 @battles.reverse.map { battle =>
     <tr>
-        <td>@battle.challengerMail</td><td>@battle.challengerVersion</td>
-        <td>@battle.opponentMail</td><td>@battle.opponentVersion</td>
+        <td>@battle.blackMail</td><td>@battle.blackVersion</td>
+        <td>@battle.whiteMail</td><td>@battle.whiteVersion</td>
         <td>@battle.status</td><td><a href="/battles/@battle.id">detail</a></td>
     </tr>
 }

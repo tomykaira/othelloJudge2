@@ -11,7 +11,7 @@ import java.lang.Thread.UncaughtExceptionHandler
  * Time: 6:57 PM
  */
 
-class Server(val battle: Battle, val challenger: Client, val opponent: Client,
+class Server(val battle: Battle, val black: Client, val white: Client,
   val port: Int) {
 
   val ROUND_TIMEOUT = 60 * 1000
@@ -26,19 +26,18 @@ class Server(val battle: Battle, val challenger: Client, val opponent: Client,
     val pt = new ProgramThread(builder)
     pt.setLineCallback { line =>
       if (line == "Waiting connections ... ") {
-        println("invoking")
-        challenger.start(port)
+        black.start(port)
         Logger.info("challenger's client is started")
       }
       if (line == "One player is registered. Waiting for other player ...") {
-        opponent.start(port)
+        white.start(port)
         Logger.info("opponent's client is started")
       }
     }
 
     pt.setAfterCallback { exitValue =>
-      challenger.forceExit
-      opponent.forceExit
+      black.forceExit
+      white.forceExit
 
       if (exitValue == 0) {
         BattleRecorder.report(NormalExit(battle, pt.getOutput))

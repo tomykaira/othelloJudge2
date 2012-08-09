@@ -12,10 +12,11 @@ class BattleStatus
 object BattleStatus {
   def read(s: String): BattleStatus = s match {
     case "running" => Running()
-    case "challenger won" => ChallengerWon()
-    case "opponent won" => OpponentWon()
+    case "black won" => BlackWon()
+    case "white won" => WhiteWon()
     case "error exit" => ErrorExit()
     case "even" => Even()
+    case _ => OldData()
   }
 }
 
@@ -23,12 +24,12 @@ case class Running() extends BattleStatus {
   override def toString = "running"
 }
 
-case class ChallengerWon() extends BattleStatus {
-  override def toString = "challenger won"
+case class BlackWon() extends BattleStatus {
+  override def toString = "black won"
 }
 
-case class OpponentWon() extends BattleStatus {
-  override def toString =  "opponent won"
+case class WhiteWon() extends BattleStatus {
+  override def toString =  "white won"
 }
 
 case class ErrorExit() extends BattleStatus {
@@ -37,4 +38,8 @@ case class ErrorExit() extends BattleStatus {
 
 case class Even() extends BattleStatus {
   override def toString = "even"
+}
+
+case class OldData() extends BattleStatus {
+  override def toString = "old data"
 }

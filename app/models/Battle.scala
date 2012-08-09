@@ -16,11 +16,11 @@ import anorm._
 import anorm.SqlParser._
 
 
-case class Battle(id: Long, challengerMail: String, challengerVersion: Int,
-                   opponentMail: String, opponentVersion: Int, status: BattleStatus,
+case class Battle(id: Long, blackMail: String, blackVersion: Int,
+                   whiteMail: String, whiteVersion: Int, status: BattleStatus,
                    serverOutput: String) {
   def shortInfo = {
-    "[" + id + "] " + challengerMail + " vs. " + opponentMail
+    "[" + id + "] " + blackMail + " vs. " + whiteMail
   }
 }
 
@@ -79,7 +79,7 @@ object Battle {
   /**
    * Create a Battle
    */
-  def create(challenger: Program, opponent: Program): Battle = {
+  def create(black: Program, white: Program): Battle = {
     DB.withConnection { implicit connection =>
 
       val id: Long =
@@ -96,16 +96,16 @@ object Battle {
         """
       ).on(
         'id -> id,
-        'cmail -> challenger.user,
-        'cv -> challenger.version,
-        'omail -> opponent.user,
-        'ov -> opponent.version,
+        'cmail -> black.user,
+        'cv -> black.version,
+        'omail -> white.user,
+        'ov -> white.version,
         'defaultStatus -> Running().toString,
         'output -> ""
       ).executeUpdate()
 
-      Battle(id, challenger.user, challenger.version,
-        opponent.user, opponent.version, Running(), "")
+      Battle(id, black.user, black.version,
+        white.user, white.version, Running(), "")
 
     }
   }

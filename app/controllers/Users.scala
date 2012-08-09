@@ -95,9 +95,11 @@ object Users extends Controller with Secured {
 
           import List._
 
-          // TODO from here
           fill(blackTimes) {
             BattleWorker ! Battle.create(latestChallengerProgram, latestOpponentProgram)
+          }
+          fill(whiteTimes) {
+            BattleWorker ! Battle.create(latestOpponentProgram, latestChallengerProgram)
           }
 
           Redirect(routes.Users.index).flashing(
