@@ -44,7 +44,7 @@ case class Program(user: String, path: String, version: Int) {
         if (executable.exists)
           Some(executable)
         else {
-          Logger.warn("Compile of " + this + " is finished, but reversi does not exist")
+          Logger.warn("Compile of " + this + " is finished, but reversi does not exist \n" + result)
           None
         }
       }
