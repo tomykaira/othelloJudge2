@@ -20,7 +20,11 @@ object Battles extends Controller {
         "White: " + battle.whiteMail,
         "Version: " + battle.whiteVersion,
         "Result: " + battle.status,
-        "Server output: " + battle.serverOutput
+        "Server output: " + battle.serverOutput,
+        "-------------------------------------",
+        "Black output: " + battle.blackOutput,
+        "-------------------------------------",
+        "White output: " + battle.whiteOutput
       )
       Ok(output.mkString("\n")).as("text/plain")
     }.getOrElse {

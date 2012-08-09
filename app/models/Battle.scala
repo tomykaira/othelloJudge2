@@ -18,7 +18,8 @@ import anorm.SqlParser._
 
 case class Battle(id: Long, blackMail: String, blackVersion: Int,
                    whiteMail: String, whiteVersion: Int, status: BattleStatus,
-                   serverOutput: String) {
+                   serverOutput: String, blackOutput: String,
+                   whiteOutput: String) {
   def shortInfo = {
     "[" + id + "] " + blackMail + " vs. " + whiteMail
   }
@@ -40,9 +41,12 @@ object Battle {
       get[String]("battle.white_mail") ~
       get[Int]("battle.white_version") ~
       get[String]("battle.status") ~
-      get[String]("battle.server_output") map {
-      case id~cmail~cv~omail~ov~status~output =>
-        Battle(id, cmail, cv, omail, ov, BattleStatus.read(status), output)
+      get[String]("battle.server_output") ~
+      get[String]("battle.black_output") ~
+      get[String]("battle.white_output") map {
+      case id~cmail~cv~omail~ov~status~server~black~white =>
+        Battle(id, cmail, cv, omail, ov, BattleStatus.read(status), server,
+        black, white)
     }
   }
 
@@ -105,7 +109,7 @@ object Battle {
       ).executeUpdate()
 
       Battle(id, black.user, black.version,
-        white.user, white.version, Running(), "")
+        white.user, white.version, Running(), "", "", "")
 
     }
   }
