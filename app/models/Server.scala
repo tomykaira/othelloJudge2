@@ -36,6 +36,7 @@ class Server(val battle: Battle, val black: Client, val white: Client,
     }
 
     pt.setAfterCallback { exitValue =>
+      Logger.info("battle finished")
       black.forceExit
       white.forceExit
 
@@ -57,5 +58,6 @@ class Server(val battle: Battle, val black: Client, val white: Client,
     })
 
     pt.start
+    pt.join
   }
 }
