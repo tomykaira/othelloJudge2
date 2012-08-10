@@ -56,6 +56,16 @@
         <td>@battle.blackMail</td><td>@battle.blackVersion</td>
         <td>@battle.whiteMail</td><td>@battle.whiteVersion</td>
         <td>@battle.status</td><td><a href="/battles/@battle.id">detail</a></td>
+        <td>
+            @if(battle.blackMail == user.email) {
+              <a href="/battles/black/@battle.id">black output</a>
+            }
+        </td>
+        <td>
+            @if(battle.whiteMail == user.email) {
+            <a href="/battles/white/@battle.id">white output</a>
+            }
+        </td>
     </tr>
 }
 </table>
