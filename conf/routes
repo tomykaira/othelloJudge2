@@ -15,6 +15,8 @@ POST    /user/upload                controllers.Users.upload
 POST    /user/new-battle            controllers.Users.newBattle
 
 GET     /battles/:id                controllers.Battles.show(id: Long)
+GET     /battles/black/:id          controllers.Battles.clientBlack(id: Long)
+GET     /battles/white/:id          controllers.Battles.clientWhite(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
