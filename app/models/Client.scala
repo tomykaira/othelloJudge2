@@ -15,7 +15,7 @@ class Client(val path: File) extends ProgramThread(new ProcessBuilder()) {
 
   def start(port: Int): Unit = {
     builder.command(path.toString, "localhost", port.toString)
-    builder redirectErrorStream false
+    builder redirectErrorStream true
     builder directory path.getParentFile
 
     setUncaughtExceptionHandler(new UncaughtExceptionHandler {
