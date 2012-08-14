@@ -23,6 +23,27 @@ case class Battle(id: Long, blackMail: String, blackVersion: Int,
   def shortInfo = {
     "[" + id + "] " + blackMail + " vs. " + whiteMail
   }
+
+  def kifu: String =
+    if (status == WhiteWon() || status == BlackWon())
+      parseOutputToKifu
+    else
+      ""
+
+  private def parseOutputToKifu = {
+    val kifuLine = new StringBuilder()
+    serverOutput.split("\n").foreach { l =>
+      if (l.startsWith("Received")) {
+        if (l.indexOf("pass") == -1)
+          kifuLine.append(l.substring(10, 12))
+        else
+          kifuLine.append("PS")
+      }
+    }
+    if (kifuLine.endsWith("PSPS"))
+      kifuLine.delete(kifuLine.length-4,kifuLine.length)
+    kifuLine.toString.toUpperCase
+  }
 }
 
 

@@ -21,7 +21,9 @@ object Battles extends Controller {
 
   def show (id: Long) = Action {
     Battle.findById(id).map { battle =>
-      val output = commonHeader(battle) ++ List("Server output: " + battle.serverOutput)
+      val output = commonHeader(battle) ++
+          List("Kifu: " + battle.kifu,
+               "Server output: " + battle.serverOutput)
       Ok(output.mkString("\n")).as("text/plain")
     }.getOrElse {
       NotFound("There is no battle with id " + id).as("text/plain")
