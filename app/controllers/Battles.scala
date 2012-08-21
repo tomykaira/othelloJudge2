@@ -2,7 +2,7 @@ package controllers
 
 import play.api.mvc.{Action, Controller}
 import views.html
-import models.Battle
+import models._
 
 /**
  * Battle's RESTful controller
@@ -11,13 +11,20 @@ import models.Battle
  * Time: 7:12 PM
  */
 
-object Battles extends Controller {
+object Battles extends Controller with Secured {
   def commonHeader (battle: Battle): List[String] = List(
     "Black: " + battle.blackMail,
     "Version: " + battle.blackVersion,
     "White: " + battle.whiteMail,
     "Version: " + battle.whiteVersion,
     "Result: " + battle.status)
+
+  def index = IsAuthenticated { username => implicit request =>
+    User.findByEmail(username).map { user =>
+      val battles = Battle.findAll
+      Ok(html.battles.index(user, battles))
+    }.getOrElse(Forbidden)
+  }
 
   def show (id: Long) = Action {
     Battle.findById(id).map { battle =>

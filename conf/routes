@@ -14,6 +14,7 @@ GET     /user/new                   controllers.Users.newAccount
 POST    /user/upload                controllers.Users.upload
 POST    /user/new-battle            controllers.Users.newBattle
 
+GET     /battles                    controllers.Battles.index
 GET     /battles/:id                controllers.Battles.show(id: Long)
 GET     /battles/black/:id          controllers.Battles.clientBlack(id: Long)
 GET     /battles/white/:id          controllers.Battles.clientWhite(id: Long)
