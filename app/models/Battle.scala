@@ -95,6 +95,12 @@ object Battle {
     }
   }
 
+  def findRecent(count: Long): Seq[Battle] = {
+    DB.withConnection { implicit connection =>
+      SQL("SELECT * FROM battle ORDER BY id DESC LIMIT {count}").on('count -> count).as(Battle.simple.*)
+    }
+  }
+
   def findById(id: Long): Option[Battle] = {
     DB.withConnection { implicit connection =>
       SQL("select * from battle where id = {id}").on('id -> id).as(Battle.simple.singleOpt)

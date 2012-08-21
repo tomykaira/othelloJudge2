@@ -43,7 +43,7 @@ object Users extends Controller with Secured {
 
   def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
-      val battles = Battle.findAll()
+      val battles = Battle.findRecent(20)
       val users = User.findAllWithProgram
       Ok(html.users.index(battleForm, user, users, battles))
     }.getOrElse(Forbidden)
