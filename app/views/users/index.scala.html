@@ -51,7 +51,7 @@
 
 <h2>Recent battles</h2>
 <table>
-@battles.reverse.map { battle =>
+@battles.map { battle =>
     <tr>
         <td>@battle.blackMail</td><td>@battle.blackVersion</td>
         <td>@battle.whiteMail</td><td>@battle.whiteVersion</td>
